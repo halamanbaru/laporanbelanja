@@ -64,12 +64,29 @@ const loadData = async() => {
             numberCell.textContent = index + 1;
             const name_itemCell = document.createElement('td');
             name_itemCell.textContent = item.name_item;
+            
+            // Create input for qty
             const qtyCell = document.createElement('td');
-            qtyCell.contentEditable = 'true';
-            qtyCell.textContent = item.qty;
+            const qtyInput = document.createElement('input');
+            qtyInput.type = 'number';
+            qtyInput.value = item.qty;
+            qtyInput.style.width = '100%';
+            qtyInput.style.border = 'none';
+            qtyInput.style.background = 'transparent';
+            qtyInput.style.textAlign = 'center';
+            qtyCell.appendChild(qtyInput);
+
+            // Create input for price
             const priceCell = document.createElement('td');
-            priceCell.contentEditable = 'true';
-            priceCell.textContent = formatNumber(item.price);
+            const priceInput = document.createElement('input');
+            priceInput.type = 'number';
+            priceInput.value = item.price;
+            priceInput.style.width = '100%';
+            priceInput.style.border = 'none';
+            priceInput.style.background = 'transparent';
+            priceInput.style.textAlign = 'center';
+            priceCell.appendChild(priceInput);
+
             const editCell = document.createElement('td');
             const deleteButton = document.createElement('button');
             deleteButton.className = 'btn btn-info';
@@ -84,22 +101,10 @@ const loadData = async() => {
             tableBody.appendChild(row);
 
             grandTotal += parseFloat(item.price) * parseFloat(item.qty);
-            qtyCell.addEventListener('input', (event) => {
-                const value = event.target.textContent;
-                if (!/^\d*\.?\d*$/.test(value)) {
-                    event.target.textContent = value.replace(/[^\d.]/g, '');
-                }
-            });
 
-            priceCell.addEventListener('input', (event) => {
-                const value = event.target.textContent;
-                if (!/^\d*\.?\d*$/.test(value)) {
-                    event.target.textContent = value.replace(/[^\d.]/g, '');
-                }
-            });
-
-            qtyCell.addEventListener('blur', () => saveEdit(index, 'qty', qtyCell.textContent));
-            priceCell.addEventListener('blur', () => saveEdit(index, 'price', priceCell.textContent));
+            // Tambahkan event listener untuk menyimpan perubahan
+            qtyInput.addEventListener('change', () => saveEdit(index, 'qty', qtyInput.value));
+            priceInput.addEventListener('change', () => saveEdit(index, 'price', priceInput.value));
         });
 
         $('#grandTotal').html('Rp. ' + formatNumber(grandTotal));
