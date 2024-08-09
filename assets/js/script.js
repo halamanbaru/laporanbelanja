@@ -84,8 +84,20 @@ const loadData = async() => {
             tableBody.appendChild(row);
 
             grandTotal += parseFloat(item.price) * parseFloat(item.qty);
+            qtyCell.addEventListener('input', (event) => {
+                const value = event.target.textContent;
+                if (!/^\d*\.?\d*$/.test(value)) {
+                    event.target.textContent = value.replace(/[^\d.]/g, '');
+                }
+            });
 
-            // Tambahkan event listener untuk menyimpan perubahan
+            priceCell.addEventListener('input', (event) => {
+                const value = event.target.textContent;
+                if (!/^\d*\.?\d*$/.test(value)) {
+                    event.target.textContent = value.replace(/[^\d.]/g, '');
+                }
+            });
+
             qtyCell.addEventListener('blur', () => saveEdit(index, 'qty', qtyCell.textContent));
             priceCell.addEventListener('blur', () => saveEdit(index, 'price', priceCell.textContent));
         });
