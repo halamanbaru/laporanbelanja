@@ -147,12 +147,13 @@ const lihat = () => {
     const waktuString = `${jam}:${menit}:${detik}`;
     doc.setFontSize(10);
     doc.text(`Laporan belanja, hari: ${namaHari}, jam: ${waktuString}`, 105, 15, { align: "center" });
+
     const data = JSON.parse(localStorage.getItem('formData')) || [];
     if (data.length > 0) {
         let startY = 30;
         doc.setFontSize(12);
         doc.setTextColor(100);
-        const headers = [['#', 'nama', 'qty', 'harga /pcs', 'total harganya']];
+        const headers = [['#', 'nama', 'harga /pcs', 'total harganya']];
         const tableData = [];
 
         const colorMap = {
@@ -172,28 +173,18 @@ const lihat = () => {
                 fillColor = colorMap[lowerCaseName];
                 usedColors[lowerCaseName] = fillColor;
             }
-            // else {
-            //     fillColor = generateRandomColor();
-            //     usedColors[lowerCaseName] = fillColor;
-            // }
-
+            
             tableData.push([
                 index + 1,
                 item.name_item.toLowerCase(),
-                item.qty,
                 'Rp. ' + formatNumber(pricePerQty),
                 'Rp. ' + formatNumber(item.price),
                 fillColor
             ]);
-            if (item.qty > 1) {
-                for (let i = 1; i < item.qty; i++) {
-                    tableData.push(['', item.name_item, '-', 'Rp. ' + formatNumber(pricePerQty), '-', fillColor]);
-                }
-            }
         });
 
         const totalPrice = calculateTotalPrice(data);
-        const tableDataWithTotal = [...tableData, ['', '', '', 'Total', 'Rp. ' + formatNumber(totalPrice)]];
+        const tableDataWithTotal = [...tableData, ['', '', 'Total', 'Rp. ' + formatNumber(totalPrice)]];
         doc.autoTable({
             startY,
             head: headers,
@@ -203,9 +194,7 @@ const lihat = () => {
                 0: { cellWidth: 10, halign: 'right' },
                 1: { cellWidth: 'auto', halign: 'left' },
                 2: { cellWidth: 'auto', halign: 'right' },
-                3: { cellWidth: 'auto', halign: 'right' },
-                4: { cellWidth: 'auto', halign: 'right' },
-                5: { cellWidth: 'auto', halign: 'left' }
+                3: { cellWidth: 'auto', halign: 'right' }
             },
             didDrawPage: function(data) {
                 const { height } = doc.internal.pageSize;
@@ -224,7 +213,7 @@ const lihat = () => {
                 }
 
                 const totalRowIndex = tableDataWithTotal.length - 1;
-                if (row === totalRowIndex && (col === 3 || col === 4)) {
+                if (row === totalRowIndex && (col === 2 || col === 3)) {
                     data.cell.styles.fillColor = '#d3d3d3';
                 }
             }
