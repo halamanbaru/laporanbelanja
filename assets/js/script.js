@@ -70,6 +70,8 @@ const loadData = async() => {
             const qtyInput = document.createElement('input');
             qtyInput.type = 'number';
             qtyInput.value = item.qty;
+            qtyInput.step = '0.01';
+            qtyInput.min = '0';
             qtyInput.style.width = '100%';
             qtyInput.style.border = 'none';
             qtyInput.style.background = 'transparent';
@@ -81,6 +83,8 @@ const loadData = async() => {
             const priceInput = document.createElement('input');
             priceInput.type = 'number';
             priceInput.value = item.price;
+            priceInput.step = '0.01';
+            priceInput.min = '0';
             priceInput.style.width = '100%';
             priceInput.style.border = 'none';
             priceInput.style.background = 'transparent';
@@ -101,8 +105,6 @@ const loadData = async() => {
             tableBody.appendChild(row);
 
             grandTotal += parseFloat(item.price) * parseFloat(item.qty);
-
-            // Tambahkan event listener untuk menyimpan perubahan
             qtyInput.addEventListener('change', () => saveEdit(index, 'qty', qtyInput.value));
             priceInput.addEventListener('change', () => saveEdit(index, 'price', priceInput.value));
         });
