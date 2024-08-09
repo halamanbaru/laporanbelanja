@@ -97,7 +97,6 @@ const loadData = async() => {
     }
 }
 
-
 const confirmation = async(id) => {
     Swal.fire({
         title: "",
@@ -189,12 +188,11 @@ const lihat = () => {
                 usedColors[lowerCaseName] = fillColor;
             }
 
-            // Tambahkan "pcs" dan "qty" setelah harga per unit
             tableData.push([
                 index + 1,
                 item.name_item.toLowerCase(),
                 `Rp. ${formatNumber(pricePerQty)} /pcs (${item.qty})`,
-                'Rp. ' + formatNumber(item.price * item.qty), // Total harga per item
+                'Rp. ' + formatNumber(item.price * item.qty),
                 fillColor
             ]);
         });
