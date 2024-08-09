@@ -28,17 +28,9 @@
         <h5 class="card-title">&hearts;</h5>
         <form id="form-input" class="row g-3">
           <div class="col-md-4">
-            <label for="" class="form-label">nama orderannya</label>
-            <input type="text" name="name-item" class="form-control">
-          </div>
-          <div class="col-md-4">
-            <label for="" class="form-label">qty</label>
-            <input type="number" name="qty" class="form-control">
-          </div>
-          <div class="col-md-4">
-            <label for="" class="form-label">harga @pcs</label>
+            <label for="" class="form-label">nama belanjaan</label>
             <div class="input-group">
-              <input type="text" class="form-control" name="price" placeholder="?...">
+              <textarea rows="3" name="name-item" class="form-control" placeholder="enter buat nambah belanjaan"></textarea>
               <div class="input-group-append">
                 <button class="btn btn-outline-secondary" type="button" onclick="process();">&rightarrow;</button>
               </div>
@@ -57,7 +49,7 @@
             <thead>
               <tr>
                 <th>#</th>
-                <th>nama orderannya</th>
+                <th>nama belanjaan</th>
                 <th>qty</th>
                 <th>harganya</th>
                 <th>...</th>

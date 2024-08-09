@@ -6,47 +6,41 @@ $(document).ready(function() {
 });
 
 const process = async() => {
-    const name_item = $('[name="name-item"]').val();
-    const qty = $('[name="qty"]').val();
-    const price = $('[name="price"]').val();
-    if (name_item == '') {
-        Swal.fire("nama barangnya apaan ?");
+    const name_item = $('[name="name-item"]').val().trim();
+
+    if (!name_item) {
+        Swal.fire("Nama barangnya apaan?");
         return false;
     }
+
+    const names = name_item.split(/\n+/);
     
-    if (name_item.length < 3) {
-        Swal.fire("masa nama barangnya cuma " + name_item.length + " huruf sih ?");
+    if (names.length === 0 || names.some(name => name.length < 3)) {
+        Swal.fire("Nama barang harus lebih dari 2 huruf.");
         return false;
     }
 
-    if (qty == '') {
-        Swal.fire("quantity juga diisi ya");
-        return false;
-    }
+    const data = JSON.parse(localStorage.getItem('formData')) || [];
 
-    if (price == '') {
-        Swal.fire("sama harga juga harus diisi nih");
-        return false;
-    }
+    names.forEach(name => {
+        const form = {
+            'name_item': name,
+            'qty': 0,
+            'price': 0
+        };
+        data.push(form);
+    });
 
-    const form = {
-        'name_item': name_item,
-        'qty': qty,
-        'price': price
-    }
-
-    get_data(form);
+    localStorage.setItem('formData', JSON.stringify(data));
     loadData();
+    $('[name="name-item"]').val('');
     $('#thide').removeAttr('style');
 }
 
+
 const get_data = async(obj) => {
     let data = localStorage.getItem('formData');
-    if (data) {
-        data = JSON.parse(data);
-    } else {
-        data = [];
-    }
+    data = data ? JSON.parse(data) : [];
     
     const total_price = obj.qty * obj.price;
     data.push({name_item: obj.name_item, qty: obj.qty, price: total_price});
@@ -55,10 +49,10 @@ const get_data = async(obj) => {
 }
 
 const loadData = async() => {
-    const dataSection   = document.getElementById('thide');
-    const tableBody     = document.querySelector('#show tbody');
+    const dataSection = document.getElementById('thide');
+    const tableBody = document.querySelector('#show tbody');
     tableBody.innerHTML = '';
-    const data          = JSON.parse(localStorage.getItem('formData')) || [];
+    const data = JSON.parse(localStorage.getItem('formData')) || [];
 
     if (data.length > 0) {
         dataSection.style.display = 'block';
@@ -71,23 +65,29 @@ const loadData = async() => {
             const name_itemCell = document.createElement('td');
             name_itemCell.textContent = item.name_item;
             const qtyCell = document.createElement('td');
+            qtyCell.contentEditable = 'true';
             qtyCell.textContent = item.qty;
             const priceCell = document.createElement('td');
+            priceCell.contentEditable = 'true';
             priceCell.textContent = formatNumber(item.price);
-            const deleteCell = document.createElement('td');
+            const editCell = document.createElement('td');
             const deleteButton = document.createElement('button');
             deleteButton.className = 'btn btn-info';
             deleteButton.innerHTML = '<i class="bi bi-trash"></i>';
             deleteButton.addEventListener('click', () => confirmation(index));
-            deleteCell.appendChild(deleteButton);
+            editCell.appendChild(deleteButton);
             row.appendChild(numberCell);
             row.appendChild(name_itemCell);
             row.appendChild(qtyCell);
             row.appendChild(priceCell);
-            row.appendChild(deleteCell);
+            row.appendChild(editCell);
             tableBody.appendChild(row);
 
-            grandTotal += parseFloat(item.price);
+            grandTotal += parseFloat(item.price) * parseFloat(item.qty);
+
+            // Tambahkan event listener untuk menyimpan perubahan
+            qtyCell.addEventListener('blur', () => saveEdit(index, 'qty', qtyCell.textContent));
+            priceCell.addEventListener('blur', () => saveEdit(index, 'price', priceCell.textContent));
         });
 
         $('#grandTotal').html('Rp. ' + formatNumber(grandTotal));
@@ -95,8 +95,8 @@ const loadData = async() => {
         dataSection.style.display = 'none';
         $('#section-information').attr('style', 'display: none');
     }
-
 }
+
 
 const confirmation = async(id) => {
     Swal.fire({
@@ -120,6 +120,20 @@ const confirmation = async(id) => {
     });
 }
 
+const saveEdit = (index, field, value) => {
+    const data = JSON.parse(localStorage.getItem('formData')) || [];
+    const item = data[index];
+    
+    if (field === 'qty') {
+        item.qty = parseFloat(value) || 0;
+    } else if (field === 'price') {
+        item.price = parseFloat(value.replace(/[^0-9.-]/g, '')) || 0;
+    }
+    
+    localStorage.setItem('formData', JSON.stringify(data));
+    loadData();
+}
+
 const deleteData = async(index) => {
     let data = JSON.parse(localStorage.getItem('formData')) || [];
     data.splice(index, 1);
@@ -141,10 +155,11 @@ const lihat = () => {
     const namaHari = getNamaHari(hariIni.getDay());
 
     const waktuSekarang = new Date();
-    const jam = waktuSekarang.getHours();
-    const menit = waktuSekarang.getMinutes();
-    const detik = waktuSekarang.getSeconds();
+    const jam = String(waktuSekarang.getHours()).padStart(2, '0');
+    const menit = String(waktuSekarang.getMinutes()).padStart(2, '0');
+    const detik = String(waktuSekarang.getSeconds()).padStart(2, '0');
     const waktuString = `${jam}:${menit}:${detik}`;
+    
     doc.setFontSize(10);
     doc.text(`Laporan belanja, hari: ${namaHari}, jam: ${waktuString}`, 105, 15, { align: "center" });
 
@@ -153,7 +168,7 @@ const lihat = () => {
         let startY = 30;
         doc.setFontSize(12);
         doc.setTextColor(100);
-        const headers = [['#', 'nama', 'harga /pcs', 'total harganya']];
+        const headers = [['#', 'Nama', 'Harga /pcs (Qty)', 'Total Harga']];
         const tableData = [];
 
         const colorMap = {
@@ -163,7 +178,7 @@ const lihat = () => {
 
         const usedColors = {};
         data.forEach((item, index) => {
-            const pricePerQty = parseFloat(item.price) / item.qty;
+            const pricePerQty = parseFloat(item.price);
             let fillColor = '';
             const lowerCaseName = item.name_item.toLowerCase();
             
@@ -173,12 +188,13 @@ const lihat = () => {
                 fillColor = colorMap[lowerCaseName];
                 usedColors[lowerCaseName] = fillColor;
             }
-            
+
+            // Tambahkan "pcs" dan "qty" setelah harga per unit
             tableData.push([
                 index + 1,
                 item.name_item.toLowerCase(),
-                'Rp. ' + formatNumber(pricePerQty),
-                'Rp. ' + formatNumber(item.price),
+                `Rp. ${formatNumber(pricePerQty)} /pcs (${item.qty})`,
+                'Rp. ' + formatNumber(item.price * item.qty), // Total harga per item
                 fillColor
             ]);
         });
@@ -230,7 +246,7 @@ const lihat = () => {
 }
 
 const calculateTotalPrice = (data) => {
-    return data.reduce((total, item) => total + parseFloat(item.price), 0);
+    return data.reduce((total, item) => total + (parseFloat(item.price) * parseFloat(item.qty)), 0);
 }
 
 const formatNumbered = (number) => {
