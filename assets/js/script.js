@@ -76,6 +76,7 @@ const loadData = async() => {
             qtyInput.style.border = 'none';
             qtyInput.style.background = 'transparent';
             qtyInput.style.textAlign = 'center';
+            qtyInput.addEventListener('input', validateNumberInput);
             qtyCell.appendChild(qtyInput);
 
             // Create input for price
@@ -89,6 +90,7 @@ const loadData = async() => {
             priceInput.style.border = 'none';
             priceInput.style.background = 'transparent';
             priceInput.style.textAlign = 'center';
+            priceInput.addEventListener('input', validateNumberInput);
             priceCell.appendChild(priceInput);
 
             const editCell = document.createElement('td');
@@ -105,6 +107,7 @@ const loadData = async() => {
             tableBody.appendChild(row);
 
             grandTotal += parseFloat(item.price) * parseFloat(item.qty);
+
             qtyInput.addEventListener('change', () => saveEdit(index, 'qty', qtyInput.value));
             priceInput.addEventListener('change', () => saveEdit(index, 'price', priceInput.value));
         });
@@ -113,6 +116,15 @@ const loadData = async() => {
     } else {
         dataSection.style.display = 'none';
         $('#section-information').attr('style', 'display: none');
+    }
+}
+
+function validateNumberInput(event) {
+    const input = event.target;
+    const value = input.value;
+    
+    if (!/^\d*\.?\d*$/.test(value)) {
+        input.value = value.replace(/[^\d.]/g, '');
     }
 }
 
